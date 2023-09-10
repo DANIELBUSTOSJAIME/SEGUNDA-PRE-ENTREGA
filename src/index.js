@@ -24,7 +24,7 @@ const serverExpress = app.listen(PORT, () => {
 })
 
 // CONEXION MONGOOSE
-mongoose.connect('mongodb+srv://danielbustosjaime:coderhousebackend@cluster0.vjzswx8.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://danielbustosjaime:<password>@cluster0.vjzswx8.mongodb.net/?retryWrites=true&w=majority')
 .then(() => console.log('BDD conectada'))
 .catch(() => console.log('Error en conexion con BDD'))
 
