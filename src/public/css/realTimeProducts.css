@@ -1,0 +1,39 @@
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  h2 {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .add-prod {
+    margin-bottom: 20px;
+  }
+  
+  .add-prod div {
+    margin-bottom: 10px;
+  }
+  
+  .add-prod label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  .add-prod input[type="text"] {
+    width: 200px;
+  }
+  
+  #btn-form {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #products-container {
+    margin-top: 20px;
+  }
