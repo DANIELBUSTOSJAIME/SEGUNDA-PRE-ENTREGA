@@ -1,8 +1,8 @@
 const socket = io();
-
 const btnForm = document.getElementById('btn-form');
 const form = document.getElementById('add-prod');
-const deleteForm = document.getElementById('deleteForm')
+const deleteForm = document.getElementById('deleteForm');
+const updateForm = document.getElementById('update-products');
 
 const newProd = e => {
 	e.preventDefault();
@@ -12,21 +12,33 @@ const newProd = e => {
 		description: data.get('description'),
 		category: data.get('category'),
 		price: data.get('price'),
-		code: Number(data.get('code')),
-		stock: data.get('stock')
+		code: data.get('code'),
+		stock: data.get('stock'),
+		_id: data.get('_id')
 	};
 	socket.emit('addProd', prod);
-	socket.emit('update-products');
 	form.reset();
 };
 
+updateForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const _id = updateForm.elements._id.value;
+    const title = updateForm.elements.title.value;
+    const description = updateForm.elements.description.value;
+    const price = updateForm.elements.price.value;
+    const code = updateForm.elements.code.value;
+    const stock = updateForm.elements.stock.value;
+	const status = updateForm.elements.status.value;
+    await socket.emit('update-products', { _id: _id, title: title, description: description, price: price, code: code, stock: stock, status: status });
+    e.target.reset();
+});
+
 deleteForm.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const code = deleteForm.elements["code"].value;
-    await socket.emit('delete-product', { code: code })
-    await socket.emit('update-products');
-    e.target.reset()
-})
+    e.preventDefault();
+    const _id = deleteForm.elements._id.value;
+    await socket.emit('delete-product', { _id: _id });
+    e.target.reset();
+});
 
 socket.on('products', products => {
 	const productsContainer = document.getElementById('products-container');
@@ -40,6 +52,7 @@ socket.on('products', products => {
             	<p><b>Precio: $</b>${prod.price}</p>
             	<p><b>Código:</b> ${prod.code}</p>
             	<p><b>Stock:</b> ${prod.stock}</p>
+				<p><b>ID:</b> ${prod._id}</p>
         	</div>
 		`;
 	}

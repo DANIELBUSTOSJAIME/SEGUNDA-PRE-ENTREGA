@@ -10,7 +10,7 @@ Swal.fire({
     title: "Identificación de usuario",
     text: "Ingrese su email",
     input: "text",
-    inputValidetor: (valor => {
+    inputValidator: (valor => {
         return !valor &&  "Ingrese su email valido"
     }),
     allowOutsideClick: false
@@ -28,7 +28,6 @@ botonChat.addEventListener('click', () => {
 
 socket.on('show-messages', (arrayMensajes) => {
     parrafosMensajes.innerHTML = ""
-    // Invertimos el orden del array
     const reversedMensajes = arrayMensajes.reverse();
 
     reversedMensajes.forEach(mensaje => {

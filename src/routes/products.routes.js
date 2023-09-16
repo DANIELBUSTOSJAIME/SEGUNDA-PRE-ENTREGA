@@ -4,10 +4,25 @@ import { Router } from "express";
 const productRouter = Router()
 
 productRouter.get( '/', async (req, res) => {
-    const {limit} = req.query
+    // RUTA POSTMAN - http://localhost:8080/api/products/?limit=15&page=2&sort=asc&category=games
+    const {limit, page, sort, category} = req.query
     try{
-        const products = await productModel.find.limit(limit)
-        res.status(200).send({respuesta: 'OK', mensaje: products})
+        let query = {}
+        if(category){
+            query.category = category
+        }
+        let options = {
+            limit: parseInt(limit) || 10,
+            page: parseInt(page) || 1
+        };
+        if(sort){
+            options.sort = {
+                price: sort === 'asc' ? 1 : -1
+            };
+        }
+        const paginateProductResult = await productModel.paginate(query, options)
+        console.log(paginateProductResult)
+        res.status(200).send({respuesta: 'OK', mensaje: paginateProductResult})
     } catch (error) {
         res.status(400).send({respuesta: "Error en consultar productos", mensaje: error})
     }

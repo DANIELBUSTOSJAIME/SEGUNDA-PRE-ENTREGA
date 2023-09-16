@@ -1,55 +1,96 @@
 <h1>Vista de productos en tiempo real</h1>
-
-<h2>Agregar producto</h2>
-<form id='add-prod' class='add-prod'>
+  <div id="products-container"></div>
+  <br><br>
+  <h2>Agregar Producto</h2>
+  <form id="add-prod" class="add-prod">
     <div>
-        <label for="prod-title">Nombre
-            <input type="text" name='title'>
-        </label>
+      <label for="prod-title">Nombre
+        <input type="text" required name="title">
+      </label>
     </div>
     <div>
-        <label for="prod-desc">Descripción
-            <input type="text" name='description'>
-        </label>
+      <label for="prod-desc">Descripción
+        <input type="text" required name="description">
+      </label>
     </div>
     <div>
-        <label for="prod-category">Categoría
-            <input type="text" name='category'>
-        </label>
+      <label for="prod-category">Categoría
+        <input type="text" required name="category">
+      </label>
     </div>
     <div>
-        <label for="prod-price">Precio
-            <input type="text" name='price'>
-        </label>
+      <label for="prod-price">Precio
+        <input type="text" required name="price">
+      </label>
     </div>
     <div>
-        <label for="prod-code">Código
-            <input type="text" name='code'>
-        </label>
+      <label for="prod-code">Código
+        <input type="text" required name="code">
+      </label>
     </div>
     <div>
-        <label for="prod-stock">Stock
-            <input type="text" name='stock'>
-        </label>
+      <label for="prod-stock">Stock
+        <input type="text" required name="stock">
+      </label>
     </div>
-    <button id='btn-form'>Agregar Producto</button>
-</form>
-<br><br>
-<div id='products-container'></div>
-
-<h1>Eliminar un Producto</h1>
-<form id="removeForm">
+    <button id="btn-form">Agregar Producto</button>
+  </form>
+  <br><br>
+  <h2>Actualizar Producto</h2>
+  <form id="update-products" class="update-product">
+    <div>
+      <label for="_id">ID</label>
+        <input type="text" required name="_id">
+    </div>
+    <div>
+      <label for="prod-code">Código
+        <input type="text" required name="code">
+      </label>
+    </div>
+    <div>
+      <label for="prod-title">Nombre
+        <input type="text" required name="title">
+      </label>
+    </div>
+    <div>
+      <label for="prod-desc">Descripción
+        <input type="text" required name="description">
+      </label>
+    </div>
+    <div>
+      <label for="prod-category">Categoría
+        <input type="text" required name="category">
+      </label>
+    </div>
+    <div>
+      <label for="prod-price">Precio
+        <input type="text" required name="price">
+      </label>
+    </div>
+    <div>
+      <label for="prod-stock">Stock
+        <input type="text" required name="stock">
+      </label>
+    </div>
+    <div>
+      <label for="prod-status">Status
+        <input type="text" required name="status">
+      </label>
+    </div>
+    <button id="btn-form">Actualizar Producto</button>
+  </form>
+  <br><br>
+  <h2>Eliminar Producto</h2>
+  <form id="deleteForm">
     <div class="row">
-        <div class="col-4 mb-3">
-            <label for="code">Code</label>
-            <input type="text" required name="code">
-        </div>
+      <div class="col-4 mb-3">
+        <label for="_id">ID</label>
+        <input type="text" required name="_id">
+      </div>
     </div>
     <div class="row">
-        <div class="col-12">
-            <button class="btn btn-primary" type="submit">Enviar</button>
-        </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Eliminar Producto</button>
+      </div>
     </div>
-</form>
-
-
+  </form>

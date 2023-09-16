@@ -1,0 +1,37 @@
+body{
+  background-color: beige;
+}
+.products-heading {
+  color: #333;
+  text-align: center;
+}
+
+.products-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.product {
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.product h2 {
+  margin: 0;
+  color: #007bff;
+}
+
+.product p {
+  margin: 5px 0;
+}
+
+strong {
+  text-align: center;
+  display: block;
+  margin-top: 20px;
+}
