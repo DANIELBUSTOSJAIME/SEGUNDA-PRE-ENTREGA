@@ -7,6 +7,8 @@ import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
 import mongoose from "mongoose";
 import 'dotenv/config'
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 // ROUTES
 import productRouter from "./routes/products.routes.js";
@@ -19,6 +21,7 @@ import { messagesModel } from './models/messages.models.js';
 import { productModel } from './models/products.models.js';
 import { userModel } from './models/user.models.js';
 import { cartModel } from './models/cart.models.js';
+
 
 // EXPRESS
 const app = express()
@@ -48,6 +51,41 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')));
 console.log(path.join(__dirname + '/public'))
+app.use(cookieParser(process.env.SIGNED_COOKIE))
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true
+}))
+
+// COOKIES
+app.get('/setCookie', (req, res) => {
+    res.cookie('CookieCookie', 'Esto es una cookie', {maxAge: 10000, signed: true}).send('Cookie generada')
+})
+app.get('/getCookie', (req, res) => {
+    res.send(req.signedCookies)
+})
+app.get('/session', (req, res) => {
+    if(req.session.counter){
+        req.session.counter++
+        res.send(`Ingreso ${req.session.counter} veces`)
+    }else{
+        req.session.counter = 1
+        res.send(`Ingreso por primera vez`)
+    }
+})
+
+app.get('/login', (req, res) =>{
+    const {email, password} = req.body
+    req.session.email = email
+    req.session.password = password
+    res.send('Usuario logueado')
+})
+
+app.get('/admin', (req, res) => {
+
+    res.send('Sos admin')
+})
 
 // CONFIG HANDLEBARS
 app.engine('handlebars', engine()) 
@@ -72,16 +110,6 @@ const cargarProd = async () => {
     }
 }
 cargarProd();
-
-let cartProducts = []
-const cargarCart = async () => {
-    try{
-        cartProducts = await cartModel.find().lean();
-    } catch(error){
-        console.error("Error: not cart found")
-    }
-}
-cargarCart();
 
 io.on('connection', async (socket) => {
     console.log("Servidor Socket.io conectado")
@@ -146,13 +174,31 @@ app.get('/products', (req, res) =>{
     })
 })
 
-app.get('/carts/:cid', (req, res) =>{
-    res.status(200).render('carts', {
-        title: "Carrito",
-        products: cartProducts,
-        css: "cart.css",
-        js: "cart.js"
-    })
+app.get('/carts/:cid', async (req, res) => {
+    try {
+        const cart = await cartModel.findById(req.params.cid).populate('products.id_prod');
+        if (cart) {
+            const productsCart = cart.products.map(product => {
+                return {
+                    id_prod: {
+                        title: product.id_prod.title,
+                        price: product.id_prod.price
+                    },
+                    quantity: product.quantity
+                }
+            })
+            res.status(200).render('carts', {
+                title: "Carrito",
+                products: productsCart,
+                css: "carts.css",
+                js: "carts.js"
+            })
+        } else {
+            res.status(404).send("Carrito no encontrado");
+        }
+    } catch (error) {
+        res.status(400).send("Error al obtener el carrito");
+    }
 })
 
 app.get('/realTimeProducts', (req, res) => {

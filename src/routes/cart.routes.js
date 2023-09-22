@@ -61,23 +61,25 @@ cartRouter.post( '/:cid/products/:pid', async (req, res) => {
     const {quantity} = req.body
     try{
         const cart = await cartModel.findById(cid)
+        console.log(cart)
         if(cart){
             const prod = await productModel.findById(pid)
+            console.log(prod)
             if(prod){
-                const indice = cart.products.findIndex(prod => prod.id_prod === pid)
+                const indice = cart.products.findIndex(product => product.id_prod.toString() === pid)
                 if(indice != -1){
                     cart.products[indice].quantity = quantity
                 } else{
-                    cart.products.push({id_prod: pid, quantity: quantity})
+                    cart.products.push({ id_prod: pid, quantity: quantity })
                 }
                 const respuesta = await cartModel.findByIdAndUpdate(cid, cart)
                 res.status(200).send({respuesta: 'OK', mensaje: respuesta})
             } else {
-                res.status(404).send({respuesta: 'Error en agregar producto al carrito', mensaje:"Product Not Found",})
+                res.status(404).send({respuesta: 'Error en encontrar el producto', mensaje:"Product Not Found",})
             }   
         }
         else
-            res.status(404).send({respuesta: 'Error en agregar producto al carrito', mensaje:"Cart Not Found",})
+            res.status(404).send({respuesta: 'Error en encontrar el carrito', mensaje:"Cart Not Found",})
     } catch (error) {
         res.status(400).send({respuesta: "Error en agregar producto al carrito", mensaje: error})
     }
@@ -93,45 +95,46 @@ cartRouter.delete( '/:cid', async (req, res) => {
     }
 })
 
-cartRouter.delete( '/:cid/products/:pid', async (req, res) => {
-    const {cid, pid} = req.params
-    try{
-        const cart = await cartModel.findById(cid)
-        if(cart){
-            const prod = await productModel.findById(pid)
-            if(prod){
-                const indice = cart.products.findIndex(prod => prod.id_prod.toString() === pid)
-                if(indice != -1){
-                    cart.products.slice(indice, 1)
+cartRouter.delete('/:cid/products/:pid', async (req, res) => {
+    const { cid, pid } = req.params;
+    try {
+        const cart = await cartModel.findById(cid);
+        if (cart) {
+            const prod = await productModel.findById(pid);
+            if (prod) {
+                const indice = cart.products.findIndex(product => product.id_prod.toString() === pid);
+                if (indice !== -1) {
+                    cart.products.splice(indice, 1);
                 }
-                const respuesta = await cartModel.findByIdAndUpdate(cid, cart)
-                res.status(200).send({respuesta: 'OK', mensaje: respuesta})
-            }   
+                const respuesta = await cartModel.findByIdAndUpdate(cid, cart);
+                res.status(200).send({ respuesta: 'OK', mensaje: respuesta });
+            }
         }
     } catch (error) {
-        res.status(400).send({respuesta: "Error en agregar producto al carrito", mensaje: error})
+        res.status(400).send({ respuesta: "Error en agregar producto al carrito", mensaje: error });
     }
 })
 
-cartRouter.put( '/:cid/products/:pid', async (req, res) => {
-    const {cid, pid} = req.params
-    const {quantity} = req.body
-    try{
-        const cart = await cartModel.findById(cid)
-        if(cart){
-            const prod = await productModel.findById(pid)
-            if(prod){
-                const indice = cart.products.findIndex(prod => prod.id_prod.toString() === pid)
-                if(indice != -1){
-                    cart.products[indice].quantity = quantity
-                } else{
-                    cart.products.push({id_prod: pid, quantity: quantity})
+cartRouter.put('/:cid/products/:pid', async (req, res) => {
+    const { cid, pid } = req.params;
+    const { quantity } = req.body;
+    try {
+        const cart = await cartModel.findById(cid);
+        if (cart) {
+            const prod = await productModel.findById(pid);
+            if (prod) {
+                const indice = cart.products.findIndex(product => product.id_prod.toString() === pid);
+                if (indice !== -1) {
+                    cart.products[indice].quantity = quantity;
+                } else {
+                    cart.products.push({ id_prod: pid, quantity: quantity });
                 }
-            }  
+            }
         }
-        res.status(200).send({respuesta: 'OK', mensaje: 'Carrito Actualizado'})
+        const respuesta = await cartModel.findByIdAndUpdate(cid, cart);
+        res.status(200).send({ respuesta: 'OK', mensaje: respuesta });
     } catch (error) {
-        res.status(400).send({respuesta: "Error en actualizar producto en el carrito", mensaje: error})
+        res.status(400).send({ respuesta: "Error en actualizar producto en el carrito", mensaje: error });
     }
 })
 
