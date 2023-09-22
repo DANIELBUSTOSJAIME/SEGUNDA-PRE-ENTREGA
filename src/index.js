@@ -9,19 +9,20 @@ import mongoose from "mongoose";
 import 'dotenv/config'
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 
 // ROUTES
 import productRouter from "./routes/products.routes.js";
 import cartRouter from "./routes/cart.routes.js";
 import messagesRouter from "./routes/messages.routes.js";
 import userRouter from './routes/user.routes.js';
+import sessionRouter from './routes/session.routes.js';
 
 // MODELS
 import { messagesModel } from './models/messages.models.js';
 import { productModel } from './models/products.models.js';
 import { userModel } from './models/user.models.js';
 import { cartModel } from './models/cart.models.js';
-
 
 // EXPRESS
 const app = express()
@@ -53,39 +54,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 console.log(path.join(__dirname + '/public'))
 app.use(cookieParser(process.env.SIGNED_COOKIE))
 app.use(session({
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URL,
+        mongoOptions: {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        },
+        ttl: 60
+    }),
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: false
 }))
 
-// COOKIES
-app.get('/setCookie', (req, res) => {
-    res.cookie('CookieCookie', 'Esto es una cookie', {maxAge: 10000, signed: true}).send('Cookie generada')
-})
-app.get('/getCookie', (req, res) => {
-    res.send(req.signedCookies)
-})
-app.get('/session', (req, res) => {
-    if(req.session.counter){
-        req.session.counter++
-        res.send(`Ingreso ${req.session.counter} veces`)
-    }else{
-        req.session.counter = 1
-        res.send(`Ingreso por primera vez`)
+// Autentificacion para ingresar a solo a rutas con login exitoso
+const auth = (req, res, next) => {
+    if (req.session.login) {
+        next(); 
+    } else {
+        res.redirect('/login'); 
     }
-})
-
-app.get('/login', (req, res) =>{
-    const {email, password} = req.body
-    req.session.email = email
-    req.session.password = password
-    res.send('Usuario logueado')
-})
-
-app.get('/admin', (req, res) => {
-
-    res.send('Sos admin')
-})
+}
 
 // CONFIG HANDLEBARS
 app.engine('handlebars', engine()) 
@@ -96,7 +85,8 @@ app.set('views', path.resolve(__dirname, './views'))
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
 app.use('/api/messages', messagesRouter)
-app.use('/api/user', userRouter)
+app.use('/api/users', userRouter)
+app.use('/api/sessions', sessionRouter)
 
 // SOCKET.IO
 const io = new Server(serverExpress)
@@ -153,6 +143,37 @@ io.on('connection', async (socket) => {
         const messages = await messagesModel.find();
         socket.emit('show-messages', messages);
     })
+
+    socket.on('addUser', async user => {
+        const { name, lastName, age, email, password } = user;
+        const existingUser = await userModel.findOne({ email: email });
+        console.log(existingUser)
+        if (existingUser) {
+            socket.emit('userExists');
+        } else {
+            console.log('Usuario creado:', user);
+            return await userModel.create({ name: name, lastName: lastName, age: age, email: email, password: password });
+        }
+    });
+
+    socket.on('loginUser', async ({ email, password }) => {
+        try {
+          const user = await userModel.findOne({ email: email });
+          if (user) {
+            if (user.password == password) {
+              socket.emit('loginSuccess', user);
+            } else {
+                socket.emit('loginError', 'Usuario o contraseña incorrectos'); 
+            }
+          } else {
+            socket.emit('loginError', 'Usuario no encontrado'); 
+          }
+        } catch (error) {
+          socket.emit('loginError', `Error en el inicio de sesión: ${error}`); 
+        }
+      });
+
+    
 })
 
 // RENDER
@@ -165,7 +186,8 @@ app.get('/home', (req, res) =>{
     })
 })
 
-app.get('/products', (req, res) =>{
+// /PRODUCTS REQUIERE LOGIN EXITOSO PREVIO
+app.get('/products', auth, (req, res) =>{
     res.status(200).render('products', {
         title: "Lista de Productos",
         products: listProducts,
@@ -209,6 +231,22 @@ app.get('/realTimeProducts', (req, res) => {
     })
 })
 
+app.get('/signUp', (req, res) => {
+    res.status(200).render('signUp', {
+        title: "Creacion de Usuario",
+        js: "signUp.js",
+        css: "signUp.css"
+    })
+})
+
+app.get('/login', (req, res) => {
+    res.status(200).render('login', {
+        title: "Login",
+        js: "login.js",
+        css: "login.css"
+    })
+})
+
 app.get('/chat', (req, res) => {
     res.status(200).render('chat', {
         title: "Chat",
@@ -231,4 +269,41 @@ app.post('/upload', upload.single('product'), (req, res) => {
     console.log(req.file)
     console.log(req.body)
     res.status(200).send("Imagen cargada")
+})*/
+
+/*const auth = (req, res, next)=> {
+    if(req.session.email == "admin@admin.com" && req.session.password == "1234"){
+        return next()
+    }
+    return res.send("No tenes acceso a esta ruta")
+}
+
+// COOKIES
+app.get('/setCookie', (req, res) => {
+    res.cookie('CookieCookie', 'Esto es una cookie', {maxAge: 10000, signed: true}).send('Cookie generada')
+})
+app.get('/getCookie', (req, res) => {
+    res.send(req.signedCookies)
+})
+app.get('/session', (req, res) => {
+    if(req.session.counter){
+        req.session.counter++
+        res.send(`Ingreso ${req.session.counter} veces`)
+    }else{
+        req.session.counter = 1
+        res.send(`Ingreso por primera vez`)
+    }
+})
+
+app.post('/login', (req, res) =>{
+    const {email, password} = req.body
+    req.session.email = email
+    req.session.password = password
+    console.log(req.session.email)
+    console.log(req.session.password)
+    res.send('Usuario logueado')
+})
+
+app.get('/admin', auth, (req, res) => {
+    res.send('Sos admin')
 })*/

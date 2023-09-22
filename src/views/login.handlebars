@@ -1,0 +1,17 @@
+<h1>Iniciar Sesión</h1>
+<form id="login-user" class="login-user" action="/api/sessions/login" method="POST">
+  <div>
+    <label for="login-email">Ingrese su email
+      <input type="email" required name="email">
+    </label>
+  </div>
+  <div>
+    <label for="login-password">Ingrese su contraseña
+      <input type="password" required name="password">
+    </label>
+  </div>
+  <button id="btn-form" type="submit">Iniciar Sesión</button>
+</form>
+<div>
+  <p>Aun no creaste una cuenta? Haz click <a href='/signUp'>aqui</a></p>
+</div>
