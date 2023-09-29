@@ -10,6 +10,8 @@ import 'dotenv/config'
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import passport from 'passport';
+import initializePassport from './config/passport.js';
 
 // ROUTES
 import productRouter from "./routes/products.routes.js";
@@ -67,10 +69,15 @@ app.use(session({
     saveUninitialized: false
 }))
 
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
 // Autentificacion para ingresar a solo a rutas con login exitoso
 const auth = (req, res, next) => {
-    if (req.session.login) {
+    if (req.session.user) {
         next(); 
+        
     } else {
         res.redirect('/login'); 
     }
@@ -82,8 +89,8 @@ app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
 
 // ROUTES
-app.use('/api/products', productRouter)
-app.use('/api/carts', cartRouter)
+app.use('/api/products', auth, productRouter)
+app.use('/api/carts', auth, cartRouter)
 app.use('/api/messages', messagesRouter)
 app.use('/api/users', userRouter)
 app.use('/api/sessions', sessionRouter)
@@ -192,11 +199,12 @@ app.get('/products', auth, (req, res) =>{
         title: "Lista de Productos",
         products: listProducts,
         css: "products.css",
-        js: "products.js"
+        js: "products.js",
+        user: req.session.user
     })
 })
 
-app.get('/carts/:cid', async (req, res) => {
+app.get('/carts/:cid', auth, async (req, res) => {
     try {
         const cart = await cartModel.findById(req.params.cid).populate('products.id_prod');
         if (cart) {

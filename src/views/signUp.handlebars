@@ -1,5 +1,5 @@
  <h1>Creación de Usuario</h1>
-  <form id="add-user" class="add-user">
+  <form id="add-user" class="add-user" action="/api/sessions/signUp" method="POST">
     <div>
       <label for="user-name">Nombre
         <input type="text" required name="name">
@@ -25,8 +25,11 @@
         <input type="password" required name="password">
       </label>
     </div>
-    <button id="btn-form">Crear Usuario</button>
+    <button id="btn-form" type="submit">Crear Usuario</button>
   </form>
+  <div>
+  <p>Tenes cuenta de GitHub? Haz click para registrarte <a href='/api/sessions/githubCallback'>aqui</a></p>
+</div>
   <div>
   <p>Ya tienes una cuenta? Haz click <a href='/login'>aqui</a></p>
 </div>

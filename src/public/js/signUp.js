@@ -2,7 +2,7 @@ const socket = io();
 const btnForm = document.getElementById('btn-form');
 const form = document.getElementById('add-user');
 
-const newUser = e => {
+/*const newUser = e => {
 	e.preventDefault();
 	const data = new FormData(form);
 	const user = {
@@ -14,9 +14,11 @@ const newUser = e => {
 	};
 	socket.emit('addUser', user);
 	form.reset();
-};
+};*/
 
-btnForm.addEventListener('click', newUser);
+btnForm.addEventListener('click', () => {
+	form.submit()
+});
 
 socket.on('userExists', () => {
 	alert('El email ingresado ya ha sido registrado en la base de datos');

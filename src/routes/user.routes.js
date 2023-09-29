@@ -25,7 +25,8 @@ userRouter.get( '/:id', async (req, res) => {
     }
 })
 
-userRouter.post( '/', async (req, res) => {
+//create user sin passport
+/*userRouter.post( '/', async (req, res) => {
     const {name, lastName, age, email, password, rol } = req.body
     try{
         const user = await userModel.create({name, lastName, age, email, password, rol})
@@ -33,7 +34,7 @@ userRouter.post( '/', async (req, res) => {
     } catch (error) {
         res.status(400).send({respuesta: "Error en crear usuario", mensaje: error})
     }
-})
+})*/
 
 userRouter.put( '/:id', async (req, res) => {
     const {id} = req.params
