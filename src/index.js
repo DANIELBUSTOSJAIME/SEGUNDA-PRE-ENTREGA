@@ -14,11 +14,7 @@ import passport from 'passport';
 import initializePassport from './config/passport.js';
 
 // ROUTES
-import productRouter from "./routes/products.routes.js";
-import cartRouter from "./routes/cart.routes.js";
-import messagesRouter from "./routes/messages.routes.js";
-import userRouter from './routes/user.routes.js';
-import sessionRouter from './routes/session.routes.js';
+import router from './routes/index.routes.js';
 
 // MODELS
 import { messagesModel } from './models/messages.models.js';
@@ -89,11 +85,7 @@ app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
 
 // ROUTES
-app.use('/api/products', auth, productRouter)
-app.use('/api/carts', auth, cartRouter)
-app.use('/api/messages', messagesRouter)
-app.use('/api/users', userRouter)
-app.use('/api/sessions', sessionRouter)
+app.use('/', router)
 
 // SOCKET.IO
 const io = new Server(serverExpress)

@@ -17,14 +17,14 @@ cartRouter.get( '/:id', async (req, res) => {
     }
 })
 
-cartRouter.post( '/', async (req, res) => {
+/*cartRouter.post( '/', async (req, res) => {
     try{
         const cart = await cartModel.create({})
         res.status(200).send({respuesta: 'OK', mensaje: cart})
     } catch (error) {
         res.status(400).send({respuesta: "Error en crear carrito", mensaje: error})
     }
-})
+})*/
 
 cartRouter.put('/:cid', async (req, res) => {
     const { cid } = req.params
