@@ -55,14 +55,14 @@ sessionRouter.post('/login', passport.authenticate('login'), async (req, res) =>
     }
   });
 
-  sessionRouter.get('/testJWT', passport.authenticate('jwt', {session: false}), async (req,res) => {
+  sessionRouter.get('/testJWT', passport.authenticate('jwt', {session: false}), (req,res) => {
     console.log(req)
     res.send(req.user)
   })
 
-  sessionRouter.get('/current', passportError('jwt', authorization('Admin'), (req,res) =>{
+  sessionRouter.get('/current', passportError('jwt'), authorization('admin'), (req,res) =>{
     res.send(req.user)
-  }))
+  })
 
   sessionRouter.get('/github', passport.authenticate('github', {scope: ['user:email']}), async (req, res) => {
     res.status(200).send({mensaje: "Usuario registrado"})
@@ -82,10 +82,11 @@ sessionRouter.post('/login', passport.authenticate('login'), async (req, res) =>
 
   sessionRouter.get('/logout', (req, res) => {
     if (req.session.login) {
-      req.session.destroy();
+      req.session.destroy()
     }
+    res.clearCookie('jwtCookie')
     //res.redirect('/login');
-    res.redirect('rutaLogin', 200, {resultado: 'Usuario deslogeado'})
+    res.redirect('/login', 200, {resultado: 'Usuario deslogeado'})
   })
 
 export default sessionRouter
